@@ -46,4 +46,15 @@ public class ProductController {
 
        return productDao.save(productUpdated);
     }
+
+    //HTTP DELETE
+    @DeleteMapping("/products/{id}")
+    public void deletePruductById(@PathVariable(value="id") Long productId){
+        productDao.deleteById(productId);
+    }
+
+    @DeleteMapping("/products")
+    public void deleteAllPruducts(){
+        productDao.deleteAll();
+    }
 }
