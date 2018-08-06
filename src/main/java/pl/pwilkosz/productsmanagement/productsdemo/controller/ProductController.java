@@ -55,29 +55,27 @@ public class ProductController {
     public void deletePruductById(@PathVariable(value="id") Long productId){
         Product productDeleted = productDao.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product", "id", productId));
-
-        ProductArchive productArchive = new ProductArchive();
-        productArchive.setProductId(productDeleted.getProductId());
-        productArchive.setDescription(productDeleted.getDescription());
-        productArchive.setProductTypeId(productDeleted.getProductTypeId());
-        productDao.deleteById(productId);
         productDao.delete(productDeleted);
         productDao.flush();
-        productArchiveDao.save(productArchive);
+        archiveProduct(productDeleted);
+
     }
 
     @DeleteMapping("/products")
     public void deleteAllPruducts(){
         List<Product> products = productDao.findAll();
         for (Product productDeleted : products) {
-            ProductArchive productArchive = new ProductArchive();
-            productArchive.setProductId(productDeleted.getProductId());
-            productArchive.setDescription(productDeleted.getDescription());
-            productArchive.setProductTypeId(productDeleted.getProductTypeId());
-            productDao.deleteById(productDeleted.getProductId());
             productDao.delete(productDeleted);
             productDao.flush();
-            productArchiveDao.save(productArchive);
+            archiveProduct(productDeleted);
         }
+    }
+
+    private void archiveProduct(Product productDeleted){
+        ProductArchive productArchive = new ProductArchive();
+        productArchive.setProductId(productDeleted.getProductId());
+        productArchive.setDescription(productDeleted.getDescription());
+        productArchive.setProductTypeId(productDeleted.getProductTypeId());
+        productArchiveDao.save(productArchive);
     }
 }
