@@ -1,11 +1,12 @@
 package pl.pwilkosz.productsmanagement.productsdemo.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.pwilkosz.productsmanagement.productsdemo.dao.ProductArchiveDao;
 import pl.pwilkosz.productsmanagement.productsdemo.dao.ProductDao;
 import pl.pwilkosz.productsmanagement.productsdemo.exceptions.ResourceNotFoundException;
 import pl.pwilkosz.productsmanagement.productsdemo.model.Product;
+import pl.pwilkosz.productsmanagement.productsdemo.model.ProductArchive;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.List;
 public class ProductController {
     @Autowired
     ProductDao productDao;
+    @Autowired
+    ProductArchiveDao productArchiveDao;
 
     // Select all products
     @GetMapping("/products")
@@ -50,11 +53,29 @@ public class ProductController {
     //HTTP DELETE
     @DeleteMapping("/products/{id}")
     public void deletePruductById(@PathVariable(value="id") Long productId){
-        productDao.deleteById(productId);
+        Product productDeleted = productDao.findById(productId)
+                .orElseThrow(()-> new ResourceNotFoundException("Product", "id", productId));
+        productDao.delete(productDeleted);
+        productDao.flush();
+        archiveProduct(productDeleted);
+
     }
 
     @DeleteMapping("/products")
     public void deleteAllPruducts(){
-        productDao.deleteAll();
+        List<Product> products = productDao.findAll();
+        for (Product productDeleted : products) {
+            productDao.delete(productDeleted);
+            productDao.flush();
+            archiveProduct(productDeleted);
+        }
+    }
+
+    private void archiveProduct(Product productDeleted){
+        ProductArchive productArchive = new ProductArchive();
+        productArchive.setProductId(productDeleted.getProductId());
+        productArchive.setDescription(productDeleted.getDescription());
+        productArchive.setProductTypeId(productDeleted.getProductTypeId());
+        productArchiveDao.save(productArchive);
     }
 }
