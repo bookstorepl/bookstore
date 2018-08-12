@@ -11,12 +11,10 @@ VOLUME /tmp
 EXPOSE 8080
 
 # The application's jar file
-ARG JAR_FILE=out/artifacts/products_demo_jar/products-demo.jar
+ARG JAR_FILE=target/products-demo-0.0.1-SNAPSHOT.jar
 
 # Add the application's jar to the container
 ADD ${JAR_FILE} products-demo.jar
-
-EXPOSE 5432
 
 # Run the jar file
 ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/products-demo.jar"]
