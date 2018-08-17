@@ -1,5 +1,6 @@
 package pl.pwilkosz.productsmanagement.productsdemo.dao;
 
+import autofixture.publicinterface.Any;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,17 +25,20 @@ public class ProductDaoTest {
     private ProductDao productDao;
 
     @Test
-    public void whenFindByIdThenReturnProduct(){
+    public void whenFindByIdThenReturnProduct() {
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("pszenna");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
         entityManager.persist(flour);
         entityManager.flush();
 
         //WHEN
-        Optional <Product> found = productDao.findById(1L);
+        Optional<Product> found = productDao.findById(productId);
 
         //THEN
         assertThat(flour.getProductId()).isEqualTo(found.get().getProductId());

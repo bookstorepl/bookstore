@@ -1,5 +1,6 @@
 package pl.pwilkosz.productsmanagement.productsdemo.controller;
 
+import autofixture.publicinterface.Any;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(ProductController.class)
 public class ProductControllerTest {
 
+    private final String PRODUCTS_URL = "/api/products";
+
     @Autowired
     private MockMvc mvc;
 
@@ -45,17 +48,20 @@ public class ProductControllerTest {
     public void getAllProducts() throws Exception {
 
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("fajna maka");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
 
         List<Product> products = singletonList(flour);
 
         given(productDao.findAll()).willReturn(products);
 
         //WHEN
-        mvc.perform(get("/api/products")
+        mvc.perform(get(PRODUCTS_URL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
@@ -71,15 +77,18 @@ public class ProductControllerTest {
     public void getProductById() throws Exception {
 
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("fajna maka");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
 
-        given(productDao.findById(1L)).willReturn(Optional.of(flour));
+        given(productDao.findById(productId)).willReturn(Optional.of(flour));
 
         //WHEN
-        mvc.perform(get("/api/products/1")
+        mvc.perform(get(PRODUCTS_URL + "/" + productId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.productId", is(flour.getProductId().intValue())))
@@ -94,10 +103,11 @@ public class ProductControllerTest {
     public void getProductByIdWhenProductDoNotExistInDataBase() throws Exception {
 
         //GIVEN
-        given(productDao.findById(1L)).willThrow(new ResourceNotFoundException("Product", "id", 1));
+        long productId = Any.intValue();
+        given(productDao.findById(productId)).willThrow(new ResourceNotFoundException("Product", "id", productId));
 
         //WHEN
-        mvc.perform(get("/api/products/1")
+        mvc.perform(get(PRODUCTS_URL + "/" + productId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -109,13 +119,16 @@ public class ProductControllerTest {
     public void createProduct() throws Exception {
 
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("fajna maka");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
 
         //WHEN
-        mvc.perform(post("/api/products")
+        mvc.perform(post(PRODUCTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(flour)))
                 .andExpect(status().isOk());
@@ -126,20 +139,26 @@ public class ProductControllerTest {
     @Test
     public void updateProduct() throws Exception {
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("fajna maka");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
 
+        long productId2 = Any.intValue();
+        String description2 = Any.string();
+        long productType2 = Any.intValue();
         Product newFlour = new Product();
-        newFlour.setProductId(1L);
-        newFlour.setDescription("new maka");
-        newFlour.setProductTypeId(2L);
+        newFlour.setProductId(productId2);
+        newFlour.setDescription(description2);
+        newFlour.setProductTypeId(productType2);
 
-        given(productDao.findById(1L)).willReturn(Optional.of(flour));
+        given(productDao.findById(productId)).willReturn(Optional.of(flour));
 
         //WHEN
-        mvc.perform(put("/api/products/1")
+        mvc.perform(put(PRODUCTS_URL + "/" + productId)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newFlour)))
                 .andExpect(status().isOk());
@@ -150,15 +169,18 @@ public class ProductControllerTest {
     @Test
     public void updateProductWhenProductDoNotExistInDataBase() throws Exception {
         //GIVEN
+        long productId2 = Any.intValue();
+        String description2 = Any.string();
+        long productType2 = Any.intValue();
         Product newFlour = new Product();
-        newFlour.setProductId(1L);
-        newFlour.setDescription("new maka");
-        newFlour.setProductTypeId(2L);
+        newFlour.setProductId(productId2);
+        newFlour.setDescription(description2);
+        newFlour.setProductTypeId(productType2);
 
-        given(productDao.findById(1L)).willReturn(Optional.empty());
+        given(productDao.findById(productId2)).willThrow(new ResourceNotFoundException("Product", "id", productId2));
 
         //WHEN
-        mvc.perform(put("/api/products/1")
+        mvc.perform(put(PRODUCTS_URL + "/" + productId2)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(asJsonString(newFlour)))
                 .andExpect(status().isNotFound());
@@ -170,15 +192,18 @@ public class ProductControllerTest {
     public void deletePruductById() throws Exception {
 
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("fajna maka");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
 
-        given(productDao.findById(1L)).willReturn(Optional.of(flour));
+        given(productDao.findById(productId)).willReturn(Optional.of(flour));
 
         //WHEN
-        mvc.perform(delete("/api/products/1")
+        mvc.perform(delete(PRODUCTS_URL + "/" + productId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -189,10 +214,11 @@ public class ProductControllerTest {
     public void deletePruductByIdWhenProductDoNotExistInDataBase() throws Exception {
 
         //GIVEN
-        given(productDao.findById(1L)).willReturn(Optional.empty());
+        long productId = Any.intValue();
+        given(productDao.findById(productId)).willThrow(new ResourceNotFoundException("Product", "id", productId));
 
         //WHEN
-        mvc.perform(delete("/api/products/1")
+        mvc.perform(delete(PRODUCTS_URL + "/" + productId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -203,17 +229,20 @@ public class ProductControllerTest {
     public void deleteAllPruducts() throws Exception {
 
         //GIVEN
+        long productId = Any.intValue();
+        String description = Any.string();
+        long productType = Any.intValue();
         Product flour = new Product();
-        flour.setProductId(1L);
-        flour.setDescription("fajna maka");
-        flour.setProductTypeId(2L);
+        flour.setProductId(productId);
+        flour.setDescription(description);
+        flour.setProductTypeId(productType);
 
         List<Product> products = singletonList(flour);
 
         given(productDao.findAll()).willReturn(products);
 
         //WHEN
-        mvc.perform(delete("/api/products")
+        mvc.perform(delete(PRODUCTS_URL)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
