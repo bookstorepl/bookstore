@@ -7,6 +7,8 @@ import pl.pwilkosz.productsmanagement.productsdemo.dao.ProductDao;
 import pl.pwilkosz.productsmanagement.productsdemo.exceptions.ResourceNotFoundException;
 import pl.pwilkosz.productsmanagement.productsdemo.model.Product;
 import pl.pwilkosz.productsmanagement.productsdemo.model.ProductArchive;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -15,18 +17,22 @@ import java.util.List;
 @RequestMapping("/api")
 public class ProductController {
     @Autowired
-    ProductDao productDao;
+    private ProductDao productDao;
     @Autowired
-    ProductArchiveDao productArchiveDao;
+    private ProductArchiveDao productArchiveDao;
+
+    private Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     // Select all products
     @GetMapping("/products")
     public List<Product> getAllProducts() {
+        logger.debug("CALLING_API - products method GET ALL");
         return productDao.findAll();
     }
 
     @GetMapping("/products/{id}")
     public Product getProductById(@PathVariable(value="id") Long  productId){
+        logger.debug("CALLING_API - products method GET");
         return productDao.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productId));
     }
@@ -34,6 +40,7 @@ public class ProductController {
     //HTTP POST
     @PostMapping("/products")
     public Product createProduct(@Valid @RequestBody Product product){
+        logger.debug("CALLING_API - products method POST");
         return productDao.save(product);
     }
 
@@ -41,6 +48,7 @@ public class ProductController {
     @PutMapping("/products/{id}")
     public Product updateProduct(@PathVariable(value="id") Long productId,
                                  @Valid @RequestBody Product product){
+        logger.debug("CALLING_API - products method PUT");
         Product productUpdated = productDao.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product", "id", productId));
 
@@ -53,6 +61,7 @@ public class ProductController {
     //HTTP DELETE
     @DeleteMapping("/products/{id}")
     public void deletePruductById(@PathVariable(value="id") Long productId){
+        logger.debug("CALLING_API - products method DELETE");
         Product productDeleted = productDao.findById(productId)
                 .orElseThrow(()-> new ResourceNotFoundException("Product", "id", productId));
         productDao.delete(productDeleted);
@@ -63,6 +72,7 @@ public class ProductController {
 
     @DeleteMapping("/products")
     public void deleteAllPruducts(){
+        logger.debug("CALLING_API - products method DELETE ALL");
         List<Product> products = productDao.findAll();
         for (Product productDeleted : products) {
             productDao.delete(productDeleted);
@@ -72,6 +82,7 @@ public class ProductController {
     }
 
     private void archiveProduct(Product productDeleted){
+        logger.debug(String.format("Archiving product with id {}"), productDeleted.getProductId());
         ProductArchive productArchive = new ProductArchive();
         productArchive.setProductId(productDeleted.getProductId());
         productArchive.setDescription(productDeleted.getDescription());
