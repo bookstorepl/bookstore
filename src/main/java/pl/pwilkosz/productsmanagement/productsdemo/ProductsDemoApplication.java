@@ -11,7 +11,7 @@ public class ProductsDemoApplication {
 
 	public static void main(String[] args) {
 		Logger logger = LoggerFactory.getLogger(ProductsDemoApplication.class);
-		logger.info("Starting container");
+		logger.info("Starting Products API Endpoint");
 
 		SpringApplication.run(ProductsDemoApplication.class, args);
 
