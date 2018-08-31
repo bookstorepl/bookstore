@@ -12,7 +12,7 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>/var/log/log.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M - %msg%n</Pattern>
+            <Pattern>%d{dd-MM-yyyy HH:mm:ss.SSS} [%thread] %-5level %logger{56}.%M - %msg%n</Pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <fileNamePattern>/var/log/archived/log_%d{dd-MM-yyyy}_%i.log</fileNamePattern>
@@ -40,6 +40,10 @@
         <appender-ref ref="FILE"/>
     </logger>
     <logger name="com.zaxxer" additivity="false" level="ERROR">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </logger>
+    <logger name="org.apache.kafka" additivity="false" level="DEBUG">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="FILE"/>
     </logger>
