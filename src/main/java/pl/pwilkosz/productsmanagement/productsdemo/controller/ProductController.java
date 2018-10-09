@@ -44,13 +44,13 @@ public class ProductController {
     // Select all products
     @GetMapping("/products")
     public List<Product> getAllProducts() throws ExecutionException, InterruptedException {
+        logger.debug("CALLING_API - products method GET ALL");
         Future<RecordMetadata> responseFuture = producer.send(new ProducerRecord<String, String>(
                 READ_FROM_PRODUCTS_TOPIC,
                 getAllMethodKey(),
                 getAllMethodValue()));
         responseFuture.get();
 
-        logger.debug("CALLING_API - products method GET ALL");
         return productDao.findAll();
     }
 
